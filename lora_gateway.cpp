@@ -100,7 +100,7 @@ uint32_t loraChannelArray[MAX_NB_CHANNEL]={CH_00_900,CH_01_900,CH_02_900,CH_03_9
 #define STARTING_CHANNEL 0
 #define ENDING_CHANNEL 5
 uint8_t loraChannelIndex=0;
-uint32_t loraChannelArray[MAX_NB_CHANNEL]={CH_DEFAULT,CH_01_433,CH_02_433,CH_03_433,CH_04_433,CH_05_433};
+uint32_t loraChannelArray[MAX_NB_CHANNEL]={CH_00_433,CH_01_433,CH_02_433,CH_03_433,CH_04_433,CH_05_433};
 
 #endif
 
