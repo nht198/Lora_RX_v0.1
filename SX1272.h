@@ -27,7 +27,7 @@
 #define W_REQUESTED_ACK
 //#define W_NET_KEY
 //#define W_INITIALIZATION
-#define SX1272_RST  11
+#define SX1272_RST  15
 
 #define SX1272Chip  0
 #define SX1276Chip  1
