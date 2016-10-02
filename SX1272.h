@@ -483,9 +483,9 @@ public:
 		_bandwidth = BW_125;
 		_codingRate = CR_5;
 		_spreadingFactor = SF_7;
-		_channel = CH_00_433;
+		_channel = CH_12_900;
 		_header = HEADER_ON;
-		_CRC = CRC_ON;
+		_CRC = CRC_OFF;
 		_modem = LORA;
 		_power = 15;
 		_packetNumber = 0;
