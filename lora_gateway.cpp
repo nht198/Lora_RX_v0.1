@@ -1540,7 +1540,7 @@ void  INThandler(int sig)
 #endif
 
 int main (int argc, char *argv[]){
-
+	pinMode(SX1272_RST,OUTPUT);
   int opt=0;
   
   //Specifying the expected options
