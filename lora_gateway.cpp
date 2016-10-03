@@ -38,23 +38,13 @@
 #include <math.h>
 #endif
 
-#ifdef ARDUINO
-// and SPI library on Arduino platforms
-#include <SPI.h>
-  
-  #define PRINTLN                   Serial.println("")              
-  #define PRINT_CSTSTR(fmt,param)   Serial.print(F(param))
-  #define PRINT_STR(fmt,param)      Serial.print(param)
-  #define PRINT_VALUE(fmt,param)    Serial.print(param)
-  #define FLUSHOUTPUT               Serial.flush();
-#else
+
 
   #define PRINTLN                   printf("\n")
   #define PRINT_CSTSTR(fmt,param)   printf(fmt,param)
   #define PRINT_STR(fmt,param)      PRINT_CSTSTR(fmt,param)
   #define PRINT_VALUE(fmt,param)    PRINT_CSTSTR(fmt,param)
   #define FLUSHOUTPUT               fflush(stdout);
-#endif
 
 #ifdef DEBUG
   #define DEBUGLN                 PRINTLN
@@ -157,11 +147,9 @@ boolean receivedFromSerial=false;
 boolean receivedFromLoRa=false;
 boolean withAck=false;
 
-#ifndef ARDUINO
 char keyPressBuff[30];
 uint8_t keyIndex=0;
 int ch;
-#endif
 
 // configuration variables
 //////////////////////////
@@ -202,14 +190,6 @@ double optFQ=-1.0;
 uint8_t optSW=0x12;
   
 //////////////////////////
-
-#if defined ARDUINO && not defined _VARIANT_ARDUINO_DUE_X_ && not defined __MK20DX256__
-int freeMemory () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-}
-#endif
 
 long getCmdValue(int &i, char* strBuff=NULL) {
         
@@ -651,41 +631,6 @@ void loop(void)
     receivedFromSerial=true; 
   }
 #endif
-  
-// handle keyboard input from a UNIX terminal  
-#if not defined ARDUINO && defined WINPUT
-  
-  while (unistd::read(0, &ch, 1)) {
-    
-	if (ch == '\n') {
-
-		strcpy(cmd,keyPressBuff);
-                PRINT_CSTSTR("%s","Cmd from keyboard: ");
-                PRINT_STR("%s",cmd);
-                PRINTLN;
-		
-		keyIndex=0;	
-                receivedFromSerial=true;
-	}
-	else {
-        	// backspace
-        	if (ch == 127 || ch==8) {
-        		keyIndex--;
-        	}
-        	else {
-        	
-        		keyPressBuff[keyIndex]=(char)ch;
-        		keyIndex++;
-        	}
-        }
-	
-	keyPressBuff[keyIndex]='\0';
-
-        PRINT_CSTSTR("%s","keyboard input : ");
-        PRINT_STR("%s",keyPressBuff);
-        PRINTLN;    
-  }
-#endif
 
   if (radioON && !receivedFromSerial) {
 
@@ -913,17 +858,7 @@ void loop(void)
          cmd[b]='\0';    
          PRINTLN;
          FLUSHOUTPUT;
-         
-#if not defined ARDUINO && defined WINPUT
-        // if we received something, display again the current input 
-        // that has still not be terminated
-        if (keyIndex) {
-              PRINT_CSTSTR("%s","keyboard input : ");
-              PRINT_STR("%s",keyPressBuff);
-              PRINTLN;
-        }
-
-#endif          
+                 
       }  
   }  
   
@@ -1520,48 +1455,8 @@ void loop(void)
 ///////////////////////////////
 #ifndef ARDUINO
 
-#ifdef WINPUT
-// when CTRL-C is pressed
-// set back the correct terminal settings
-void  INThandler(int sig)
-{
-    struct termios old = {0};
-    
-    if (tcgetattr(0, &old) < 0)
-                perror("tcsetattr()");
-    old.c_lflag |= ICANON;
-    old.c_lflag |= ECHO;
-    if (tcsetattr(0, TCSADRAIN, &old) < 0)
-                perror ("tcsetattr ~ICANON");
-                
-    PRINT_CSTSTR("%s","Bye.\n");            
-    exit(0);
-}
-#endif
-
 int main (int argc, char *argv[]){
 	pinMode(SX1272_SS,OUTPUT);
-  
-
-#ifdef WINPUT  
-  // set termios options to remove echo and to have non blocking read from
-  // standard input (e.g. keyboard)
-  struct termios old = {0};
-  if (tcgetattr(0, &old) < 0)
-              perror("tcsetattr()");
-  // non-blocking noncanonical mode          
-  old.c_lflag &= ~ICANON;
-  old.c_lflag &= ~ECHO;
-  // VMIN and VTIME are 0 for non-blocking    
-  old.c_cc[VMIN] = 0;
-  old.c_cc[VTIME] = 0;
-  
-  if (tcsetattr(0, TCSANOW, &old) < 0)
-          perror("tcsetattr ICANON");   
-  
-  // we catch the CTRL-C key
-  signal(SIGINT, INThandler);
-#endif
 
   setup();
   
