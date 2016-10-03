@@ -2,21 +2,6 @@
 // Include the SX1272 
 #include "SX1272.h"
 
-#ifdef ARDUINO
-// IMPORTANT when using an Arduino. For a Raspberry-based gateway the distribution uses a radio.makefile file
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// please uncomment only 1 choice
-//
-// it seems that both HopeRF and Modtronix board use the PA_BOOST pin and not the RFO. Therefore, for these
-// boards we set the initial power to 'x' and not 'M'. This is the purpose of the define statement 
-//
-// uncomment if your radio is an HopeRF RFM92W or RFM95W
-//#define RADIO_RFM92_95
-// uncomment if your radio is a Modtronix inAir9B (the one with +20dBm features), if inAir9, leave commented
-//#define RADIO_INAIR9B
-/////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-#endif
-
 // IMPORTANT
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // please uncomment only 1 choice
@@ -26,7 +11,6 @@
 //#define BAND900
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef RASPBERRY
 #include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
@@ -36,7 +20,6 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
-#endif
 
 
 
