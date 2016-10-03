@@ -38,23 +38,13 @@
 #include <math.h>
 #endif
 
-#ifdef ARDUINO
-// and SPI library on Arduino platforms
-#include <SPI.h>
-  
-  #define PRINTLN                   Serial.println("")              
-  #define PRINT_CSTSTR(fmt,param)   Serial.print(F(param))
-  #define PRINT_STR(fmt,param)      Serial.print(param)
-  #define PRINT_VALUE(fmt,param)    Serial.print(param)
-  #define FLUSHOUTPUT               Serial.flush();
-#else
+
 
   #define PRINTLN                   printf("\n")
   #define PRINT_CSTSTR(fmt,param)   printf(fmt,param)
   #define PRINT_STR(fmt,param)      PRINT_CSTSTR(fmt,param)
   #define PRINT_VALUE(fmt,param)    PRINT_CSTSTR(fmt,param)
   #define FLUSHOUTPUT               fflush(stdout);
-#endif
 
 #ifdef DEBUG
   #define DEBUGLN                 PRINTLN
@@ -157,11 +147,9 @@ boolean receivedFromSerial=false;
 boolean receivedFromLoRa=false;
 boolean withAck=false;
 
-#ifndef ARDUINO
 char keyPressBuff[30];
 uint8_t keyIndex=0;
 int ch;
-#endif
 
 // configuration variables
 //////////////////////////
