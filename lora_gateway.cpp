@@ -383,11 +383,7 @@ void setup()
     e = sx1272.setSyncWord(optSW);
 
     PRINT_CSTSTR("%s","^$Set sync word to 0x");
-#ifdef ARDUINO
-    Serial.print(optSW, HEX);
-#else  
     PRINT_VALUE("%X", optSW);
-#endif
     
     PRINTLN;
     PRINT_CSTSTR("%s","^$LoRa sync word: state ");
@@ -441,11 +437,7 @@ void CarrierSense() {
           
           if (extendedIFS)  {          
             // wait for random number of CAD
-#ifdef ARDUINO                
-            uint8_t w = random(1,8);
-#else
             uint8_t w = rand() % 8 + 1;
-#endif
   
             PRINT_CSTSTR("%s","--> waiting for ");
             PRINT_VALUE("%d",w);
@@ -476,11 +468,7 @@ void CarrierSense() {
           PRINT_CSTSTR("%s","###1\n");  
 
           // wait for random number of DIFS
-#ifdef ARDUINO                
-          uint8_t w = random(1,8);
-#else
           uint8_t w = rand() % 8 + 1;
-#endif
           
           PRINT_CSTSTR("%s","--> waiting for ");
           PRINT_VALUE("%d",w);
@@ -587,27 +575,6 @@ void loop(void)
   loraLAS.checkCycle();
 #endif
 
-#ifdef ARDUINO
-  // check if we received data from the input serial port
-  if (Serial.available()) {
-
-    i=0;  
-
-    while (Serial.available() && i<80) {
-      cmd[i]=Serial.read();
-      i++;
-      delay(50);
-    }
-    
-    cmd[i]='\0';
-
-    PRINT_CSTSTR("%s","Rcv serial: ");
-    PRINT_STR("%s",cmd);
-    PRINTLN;
-    
-    receivedFromSerial=true; 
-  }
-#endif
 
   if (radioON && !receivedFromSerial) {
 
@@ -658,11 +625,7 @@ void loop(void)
           //Serial.flush();
           
           if (random_inter_pkt_time) {
-#ifdef ARDUINO                
-            random_inter_pkt_time=random(2000,inter_pkt_time);
-#else
             random_inter_pkt_time = rand() % inter_pkt_time + 2000;
-#endif            
             PRINT_CSTSTR("%s","next in ");
             PRINT_VALUE("%ld",random_inter_pkt_time);
             PRINTLN;
@@ -771,7 +734,6 @@ void loop(void)
 
 // for Linux-based gateway only
 ///////////////////////////////
-#ifndef ARDUINO
          char buffer[30];
          int millisec;
          struct tm* tm_info;
@@ -793,7 +755,6 @@ void loop(void)
          sprintf(sprintf_buf, "^t%s.%03d\n", buffer, millisec);
 
          PRINT_STR("%s",sprintf_buf);
-#endif
          
                             
 #ifdef LORA_LAS        
@@ -924,11 +885,8 @@ void loop(void)
               }         
 
               if (random_inter_pkt_time)
-#ifdef ARDUINO                
-                random_inter_pkt_time=random(2000,inter_pkt_time);
-#else
-                random_inter_pkt_time = rand() % inter_pkt_time + 2000;
-#endif                           
+
+                random_inter_pkt_time = rand() % inter_pkt_time + 2000;                           
             break;        
             
             // set the pkt size default is 40
@@ -1093,12 +1051,8 @@ void loop(void)
               if (cmdValue <= 0)
                       cmdValue = 0x12;
               
-              PRINT_CSTSTR("%s","^$Set sync word to 0x");
-#ifdef ARDUINO
-              Serial.print(cmdValue, HEX);
-#else  
+              PRINT_CSTSTR("%s","^$Set sync word to 0x");  
               PRINT_VALUE("%X", cmdValue);
-#endif 
               PRINTLN;
               e = sx1272.setSyncWord(cmdValue);
               PRINT_CSTSTR("%s","^$LoRa sync word: state ");
@@ -1430,7 +1384,6 @@ void loop(void)
 
 // for Linux-based gateway only
 ///////////////////////////////
-#ifndef ARDUINO
 
 int main (int argc, char *argv[]){
 	pinMode(SX1272_SS,OUTPUT);
@@ -1443,5 +1396,4 @@ int main (int argc, char *argv[]){
   
   return (0);
 }
-#endif
 
