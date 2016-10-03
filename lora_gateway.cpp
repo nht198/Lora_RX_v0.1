@@ -1541,64 +1541,7 @@ void  INThandler(int sig)
 
 int main (int argc, char *argv[]){
 	pinMode(SX1272_SS,OUTPUT);
-  int opt=0;
   
-  //Specifying the expected options
-  static struct option long_options[] = {
-      {"mode", required_argument, 0,  'a' },
-      {"aes", no_argument, 0,         'b' },
-      {"bw", required_argument, 0,    'c' },
-      {"cr", required_argument, 0,    'd' },
-      {"sf", required_argument, 0,    'e' }, 
-      {"raw", no_argument, 0,         'f' },
-      {"freq", required_argument, 0,  'g' },
-      {"ch", required_argument, 0,    'h' }, 
-      {"sw", required_argument, 0,    'i' },                       
-      {0, 0, 0,  0}
-  };
-  
-  int long_index=0;
-  
-  while ((opt = getopt_long(argc, argv,"a:bc:d:e:fg:h:i:", 
-                 long_options, &long_index )) != -1) {
-      switch (opt) {
-           case 'a' : loraMode = atoi(optarg);
-               break;
-           case 'b' : optAESgw=true; // not used at the moment
-               break;
-           case 'c' : optBW = atoi(optarg); 
-                      // 125, 250 or 500
-                      // setBW() will correct the optBW value  
-               break;
-           case 'd' : optCR = atoi(optarg);
-                      // 5, 6, 7 or 8
-                      // setCR() will correct the optCR value
-               break;
-           case 'e' : optSF = atoi(optarg);
-                      // 6, 7, 8, 9, 10, 11 or 12
-               break;
-           case 'f' : optRAW=true;
-               break;               
-           case 'g' : optFQ=atof(optarg);
-                      // in MHz
-                      // e.g. 868.1
-                      loraChannel=optFQ*1000000.0*RH_LORA_FCONVERT;
-               break;     
-           case 'h' : optCH=true;
-                      loraChannelIndex=atoi(optarg);
-                      if (loraChannelIndex < STARTING_CHANNEL || loraChannelIndex > ENDING_CHANNEL)
-                        loraChannelIndex=STARTING_CHANNEL;
-                      loraChannelIndex=loraChannelIndex-STARTING_CHANNEL;  
-                      loraChannel=loraChannelArray[loraChannelIndex]; 
-               break;      
-           case 'i' : uint8_t sw=atoi(optarg);
-                      // assume that sw is expressed in hex value
-                      optSW = (sw / 10)*16 + (sw % 10);
-               break;                                   
-           //default: print_usage(); 
-           //    exit(EXIT_FAILURE);
-      }
-  }
 
 #ifdef WINPUT  
   // set termios options to remove echo and to have non blocking read from
