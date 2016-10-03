@@ -846,13 +846,7 @@ void loop(void)
               PRINTLN;              
             break;    
 
-            case 'R': 
-#ifdef LORA_LAS             
-              if (cmd[i+1]=='E' && cmd[i+2]=='G') {
-                  PRINT_CSTSTR("%s","^$Send LAS REG msg\n");
-                  loraLAS.sendReg();
-              }
-#endif              
+            case 'R':               
               if (cmd[i+1]=='S' && cmd[i+2]=='S' && cmd[i+3]=='I') {
                 
                 RSSIonSend = !RSSIonSend;
@@ -961,10 +955,6 @@ void loop(void)
               PRINT_CSTSTR("%s","^$LoRa mode: state ");
               PRINT_VALUE("%d",e);  
               PRINTLN;              
-
-#ifdef LORA_LAS
-              loraLAS.setSIFS(loraMode);
-#endif
               // get preamble length
               e = sx1272.getPreambleLength();
               PRINT_CSTSTR("%s","Get Preamble Length: state ");
@@ -1160,39 +1150,7 @@ void loop(void)
                else
                  PRINT_CSTSTR("%s","Invalid command. ON or OFF accepted.\n");          
             break;            
-
-#ifdef LORA_LAS
-            // act as an LR-BS if IS_RCV_GATEWAY or an end-device if IS_SEND_GATEWAY
-            case 'L': 
-             
-              if (cmd[i+1]=='A' && cmd[i+2]=='S') {
-                
-                if (cmd[i+3]=='S')
-                  loraLAS.showLAS();
-                  
-                if (cmd[i+3]=='R') {
-                  loraLAS.reset(); 
-                  loraLAS.showLAS();
-                }
-
-                if (cmd[i+3]=='O' && cmd[i+4]=='N')
-                  loraLAS.ON(LAS_ON_NORESET);
-
-                if (cmd[i+3]=='O' && cmd[i+4]=='F' && cmd[i+5]=='F')
-                  loraLAS.OFF();                  
-
-#ifdef IS_RCV_GATEWAY
-                // only the base station can sent an INIT restart message
-                // sends an init restart
-                if (cmd[i+3]=='I') {
-                  loraLAS.sendInit(LAS_INIT_RESTART); 
-                }
-#endif
-              }
-            break;         
-#endif
             default:
-
               PRINT_CSTSTR("%s","Unrecognized cmd\n");       
               break;
       }
@@ -1213,26 +1171,6 @@ void loop(void)
       PRINT_STR("%s",(char*)(&cmd[i]));
       PRINTLN;
       
-#ifdef LORA_LAS
-      if (forTmpDestAddr>=0)
-        e = loraLAS.sendData(forTmpDestAddr, (uint8_t*)(&cmd[i]), pl, 0, 
-              LAS_FIRST_DATAPKT+LAS_LAST_DATAPKT, withAck | withTmpAck);
-      else
-        e = loraLAS.sendData(dest_addr, (uint8_t*)(&cmd[i]), pl, 0,
-              LAS_FIRST_DATAPKT+LAS_LAST_DATAPKT, withAck | withTmpAck);
-      
-      if (e==TOA_OVERUSE) {
-          PRINT_CSTSTR("%s","^$Not sent, TOA_OVERUSE\n");  
-      }
-      
-      if (e==LAS_LBT_ERROR) {
-          PRINT_CSTSTR("%s","^$LBT error\n");  
-      }      
-      
-      if (e==LAS_SEND_ERROR || e==LAS_ERROR) {
-          PRINT_CSTSTR("%s","Send error\n");  
-      }      
-#else  
       // only the DIFS/SIFS mechanism
       // we chose to have a complete control code insytead of using the implementation of the LAS class
       // for better debugging and tests features if needed.    
@@ -1306,8 +1244,7 @@ void loop(void)
       
       PRINT_CSTSTR("%s","LoRa Sent w/CAD in ");
       PRINT_VALUE("%ld",endSend-startSendCad);
-      PRINTLN;      
-#endif    
+      PRINTLN;         
       PRINT_CSTSTR("%s","Packet sent, state ");
       PRINT_VALUE("%d",e);
       PRINTLN;
