@@ -103,11 +103,6 @@ uint32_t loraChannelArray[MAX_NB_CHANNEL]={CH_00_433,CH_01_433,CH_02_433,CH_03_4
 
 #define DEFAULT_DEST_ADDR 1
 
-#ifdef IS_SEND_GATEWAY
-#define LORA_ADDR 6
-// packet size for periodic sending
-uint8_t MSS=40;
-#else
 #define LORA_ADDR 1
 // to unlock remote configuration feature
 #define UNLOCK_PIN 1234
@@ -118,20 +113,6 @@ uint8_t MSS=40;
 #ifdef WITH_DATA_PREFIX
 #define DATA_PREFIX_0 0xFF
 #define DATA_PREFIX_1 0xFE
-#endif
-#endif
-
-#ifdef LORA_LAS
-#include "LoRaActivitySharing.h"
-
-#ifdef IS_SEND_GATEWAY
-// acting as an end-device
-LASDevice loraLAS(LORA_ADDR,LAS_DEFAULT_ALPHA,DEFAULT_DEST_ADDR);
-#else
-// acting as the LR-BS
-LASBase loraLAS = LASBase();
-#endif
-
 #endif
 
 int dest_addr=DEFAULT_DEST_ADDR;
@@ -261,10 +242,6 @@ void startConfig() {
     PRINT_CSTSTR("%s","^$Setting mode: state ");
     PRINT_VALUE("%d", e);
     PRINTLN;
-  
-  #ifdef LORA_LAS
-    loraLAS.setSIFS(loraMode);
-  #endif
   
     if (loraMode>7)
       SIFS_cad_number=6;
@@ -399,14 +376,6 @@ void setup()
   FLUSHOUTPUT;
   delay(1000);
 
-#ifdef LORA_LAS
-  loraLAS.ON(LAS_ON_WRESET);
-  
-#ifdef IS_SEND_GATEWAY  
-  //delay(random(LAS_REG_RAND_MIN,LAS_REG_RAND_MAX));
-  //loraLAS.sendReg();
-#endif  
-#endif
 
 #ifdef CAD_TEST
   PRINT_CSTSTR("%s","Do CAD test\n");
@@ -569,11 +538,6 @@ void loop(void)
 
   receivedFromSerial=false;
   receivedFromLoRa=false;
-  
-#ifdef LORA_LAS  
-  // call periodically to be able to detect the start of a new cycle
-  loraLAS.checkCycle();
-#endif
 
 
   if (radioON && !receivedFromSerial) {
@@ -756,35 +720,9 @@ void loop(void)
 
          PRINT_STR("%s",sprintf_buf);
          
-                            
-#ifdef LORA_LAS        
-         if (loraLAS.isLASMsg(sx1272.packet_received.data)) {
-           
-           //tmp_length=sx1272.packet_received.length-OFFSET_PAYLOADLENGTH;
-           tmp_length=sx1272._payloadlength;
-           
-           int v=loraLAS.handleLASMsg(sx1272.packet_received.src,
-                                      sx1272.packet_received.data,
-                                      tmp_length);
-           
-           if (v==DSP_DATA) {
-             a=LAS_DSP+DATA_HEADER_LEN+1;
-#ifdef WITH_DATA_PREFIX
-             PRINT_STR("%c",(char)DATA_PREFIX_0);      
-             PRINT_STR("%c",(char)DATA_PREFIX_1);
-#endif             
-           }
-           else
-             // don't print anything
-             a=tmp_length; 
-         }
-         else
-           PRINT_CSTSTR("%s","No LAS header. Write raw data\n");
-#else
 #ifdef WITH_DATA_PREFIX
          PRINT_STR("%c",(char)DATA_PREFIX_0);        
          PRINT_STR("%c",(char)DATA_PREFIX_1);
-#endif
 #endif
          for ( ; a<tmp_length; a++,b++) {
            PRINT_STR("%c",(char)sx1272.packet_received.data[a]);
