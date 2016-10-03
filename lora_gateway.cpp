@@ -362,25 +362,6 @@ void startConfig() {
 void setup()
 {
   int e;
-#ifdef ARDUINO
-  delay(3000);
-  randomSeed(analogRead(14));
-
-#ifdef _VARIANT_ARDUINO_DUE_X_
-  Serial.begin(115200);  
-#else  
-  // Open serial communications and wait for port to open:
-  Serial.begin(38400);
-#if defined ARDUINO && not defined __MK20DX256__
-    // Print a start message
-  Serial.print(freeMemory());
-  Serial.println(F(" bytes of free memory.")); 
-#endif  
-#endif 
-
-#else
-  srand (time(NULL));
-#endif
 
   // Power ON the module
   e = sx1272.ON();
@@ -393,12 +374,8 @@ void setup()
   e = sx1272.getSyncWord();
 
   if (!e) {
-    PRINT_CSTSTR("%s","^$Default sync word: 0x");
-#ifdef ARDUINO
-    Serial.print(sx1272._syncWord, HEX);
-#else  
+    PRINT_CSTSTR("%s","^$Default sync word: 0x"); 
     PRINT_VALUE("%X", sx1272._syncWord);
-#endif  
     PRINTLN;
   }    
 
